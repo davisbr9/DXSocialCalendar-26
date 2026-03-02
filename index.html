@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spring '26 Social Schedule</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c28;
+      --border: rgba(255,255,255,0.07);
+      --accent: #c8a96e;
+      --accent2: #e8c98a;
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --red: #e85555;
+      --green: #55c896;
+      --blue: #5599e8;
+      --purple: #a855e8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Subtle grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Header */
+    header {
+      position: relative;
+      text-align: center;
+      padding: 60px 24px 40px;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .header-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .header-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(56px, 10vw, 96px);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      background: linear-gradient(135deg, #fff 0%, var(--accent2) 50%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-sub {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 20px 24px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--surface2);
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    /* View toggle */
+    .view-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      padding: 0 24px 20px;
+    }
+
+    .view-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 20px;
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+
+    .view-btn:first-child { border-radius: 6px 0 0 6px; }
+    .view-btn:last-child { border-radius: 0 6px 6px 0; }
+
+    .view-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Main layout */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ====== LIST VIEW ====== */
+    #list-view {}
+
+    .month-block {
+      margin-bottom: 48px;
+    }
+
+    .month-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+      padding: 12px 0 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .event-row {
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+      cursor: default;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: fadeUp 0.3s forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .event-row:hover {
+      border-color: rgba(200, 169, 110, 0.3);
+      background: var(--surface2);
+      transform: translateX(4px);
+    }
+
+    .event-row.special {
+      background: linear-gradient(135deg, rgba(200,169,110,0.08), var(--surface));
+      border-color: rgba(200,169,110,0.2);
+    }
+
+    .event-row.break-row {
+      background: linear-gradient(135deg, rgba(85,200,150,0.08), var(--surface));
+      border-color: rgba(85,200,150,0.2);
+      justify-content: center;
+    }
+
+    .event-date {
+      text-align: center;
+    }
+
+    .event-date .day-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .event-date .day-name {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .event-info {}
+
+    .event-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .event-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .event-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+      padding-left: 15px;
+    }
+
+    .event-time {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* ====== CALENDAR GRID VIEW ====== */
+    #calendar-view { display: none; }
+
+    .cal-month {
+      margin-bottom: 48px;
+    }
+
+    .cal-month-header {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      letter-spacing: 0.06em;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .cal-dow {
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      padding: 8px 0;
+      text-transform: uppercase;
+    }
+
+    .cal-day {
+      min-height: 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px;
+      transition: background 0.2s;
+    }
+
+    .cal-day.empty {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .cal-day.has-event {
+      background: var(--surface2);
+      border-color: rgba(200,169,110,0.15);
+    }
+
+    .cal-day-num {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .cal-day.has-event .cal-day-num {
+      color: var(--text);
+    }
+
+    .cal-event-chip {
+      font-size: 9px;
+      padding: 2px 5px;
+      border-radius: 3px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.4;
+    }
+
+    /* Color categories */
+    .cat-party    { background: rgba(168,85,232,0.2); color: #c896f0; }
+    .cat-rental   { background: rgba(85,153,232,0.2); color: #88bbf5; }
+    .cat-sports   { background: rgba(85,200,150,0.2); color: #66d4a8; }
+    .cat-formal   { background: rgba(200,169,110,0.25); color: #d4b87a; }
+    .cat-special  { background: rgba(232,85,85,0.2); color: #f08080; }
+    .cat-other    { background: rgba(255,255,255,0.07); color: var(--muted); }
+
+    /* Responsive - Tablet */
+    @media (max-width: 768px) {
+      header { padding: 40px 16px 28px; }
+      main { padding: 0 12px 60px; }
+      .controls { gap: 6px; padding: 16px 12px; }
+      .filter-btn { padding: 6px 12px; font-size: 11px; }
+      .cal-month-header { font-size: 24px; }
+      .cal-day { min-height: 72px; padding: 4px; }
+      .cal-event-chip { font-size: 8px; padding: 2px 3px; }
+    }
+
+    /* Responsive - Mobile */
+    @media (max-width: 480px) {
+      header { padding: 32px 16px 24px; }
+      .header-sub { font-size: 11px; }
+      .legend { gap: 10px; padding: 14px 16px; }
+      .legend-item { font-size: 11px; }
+      .controls { gap: 5px; padding: 12px 16px; flex-wrap: wrap; }
+      .filter-btn { padding: 6px 10px; font-size: 11px; }
+      main { padding: 0 12px 60px; }
+      .event-row {
+        grid-template-columns: 56px 1fr;
+        gap: 10px;
+        padding: 12px 12px;
+      }
+      .event-time { display: none; }
+      .event-date .day-num { font-size: 22px; }
+      .event-name { font-size: 13px; }
+      .event-meta { font-size: 11px; }
+      .cal-grid { gap: 1px; }
+      .cal-day { min-height: 48px; padding: 3px; }
+      .cal-dow { font-size: 9px; padding: 5px 0; }
+      .cal-day-num { font-size: 11px; }
+      .cal-event-chip { display: none; }
+      .cal-day.has-event {
+        border-color: var(--accent);
+        position: relative;
+      }
+      .cal-day.has-event::after {
+        content: '';
+        display: block;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--accent);
+        margin: 2px auto 0;
+      }
+      .cal-month-header { font-size: 22px; }
+      .month-label { font-size: 12px; }
+      .count-badge { font-size: 9px; padding: 1px 6px; }
+    }
+
+    .count-badge {
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-left: 8px;
+    }
+
+    .break-banner {
+      background: linear-gradient(90deg, rgba(85,200,150,0.1), rgba(85,200,150,0.05));
+      border: 1px solid rgba(85,200,150,0.2);
+      border-radius: 8px;
+      padding: 14px 20px;
+      margin-bottom: 6px;
+      text-align: center;
+      color: var(--green);
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1 class="header-title">Spring '26<br>Social Schedule</h1>
+  <p class="header-sub">Jan &ndash; May 2026 &bull; <span id="total-count"></span> events</p>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#c896f0"></div> Party</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#88bbf5"></div> Rental / Bar</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#d4b87a"></div> Formal</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f08080"></div> Special</div>
+</div>
+
+<div class="controls">
+  <button class="filter-btn active" onclick="filterMonth('all', this)">All</button>
+  <button class="filter-btn" onclick="filterMonth('January', this)">January</button>
+  <button class="filter-btn" onclick="filterMonth('February', this)">February</button>
+  <button class="filter-btn" onclick="filterMonth('March', this)">March</button>
+  <button class="filter-btn" onclick="filterMonth('April', this)">April</button>
+  <button class="filter-btn" onclick="filterMonth('May', this)">May</button>
+</div>
+
+<div class="view-toggle">
+  <button class="view-btn active" onclick="setView('list', this)">List</button>
+  <button class="view-btn" onclick="setView('calendar', this)">Calendar</button>
+</div>
+
+<main>
+  <div id="list-view"></div>
+  <div id="calendar-view"></div>
+</main>
+
+<script>
+const rawEvents = [
+  { date: '2026-01-30', day: 'FRI', event: 'PC Keg Race', location: 'Basement', time: null },
+  { date: '2026-01-30', day: 'FRI', event: "CJ's Rental", location: "CJ's", time: '10pm' },
+  { date: '2026-02-07', day: 'SAT', event: 'Butze Bar Crawl', location: "CJ's", time: '10pm' },
+  { date: '2026-02-11', day: 'WED', event: 'Brotherhood Bonfire', location: 'House', time: '10pm' },
+  { date: '2026-02-18', day: 'WED', event: 'Wine Wednesday', location: 'House', time: '9pm' },
+  { date: '2026-02-20', day: 'FRI', event: 'Rave Party w/ Fiji & Lambda', location: 'House', time: '9pm' },
+  { date: '2026-02-21', day: 'SAT', event: 'Baseball Tourney Pregame Rental', location: 'House', time: '10pm' },
+  { date: '2026-02-24', day: 'TUE', event: 'Corner Rental', location: 'Corner', time: '9pm' },
+  { date: '2026-02-26', day: 'THU', event: '2016 Party', location: 'House', time: '9pm' },
+  { date: '2026-02-27', day: 'FRI', event: 'Wedding w/ ZTA', location: "CJ's", time: '10pm' },
+  { date: '2026-02-28', day: 'SAT', event: 'FOF w/ Adelt & Fiji', location: 'TBD', time: null },
+  { date: '2026-03-05', day: 'THU', event: 'Kappa Big Little', location: "CJ's", time: '10pm' },
+  { date: '2026-03-06', day: 'FRI', event: 'Up N Up Party', location: 'House', time: null },
+  { date: '2026-03-07', day: 'SAT', event: 'Sidewalk Slammers Pregame Rental', location: 'House', time: null },
+  { date: '2026-03-10', day: 'TUE', event: 'Corner Rental', location: 'Corner', time: '9pm' },
+  { date: '2026-03-12', day: 'THU', event: 'Champagne Shackles DP Pregame', location: 'House', time: null },
+  { date: '2026-03-13', day: 'FRI', event: "Moms Weekend Rental", location: "CJ's", time: '10pm' },
+  { date: '2026-03-14', day: 'SAT', event: 'Moms Weekend Darty', location: 'Heavy Hands', time: '4pm' },
+  { date: '2026-03-19', day: 'THU', event: 'GBD Night w/ Lambda & Fiji', location: 'Lambda', time: '1am' },
+  { date: '2026-03-19', day: 'THU', event: 'GBD Day w/ Fiji & Adelt', location: 'TBD', time: null },
+  { date: '2026-03-20', day: 'FRI', event: '🌴 SPRING BREAK', location: null, time: null, special: 'break' },
+  { date: '2026-04-01', day: 'WED', event: 'Bonfire w/ Kappa', location: 'House', time: '8pm' },
+  { date: '2026-04-02', day: 'THU', event: 'Old Money Country Club Mixer w/ Kappa', location: "CJ's", time: '10pm' },
+  { date: '2026-04-03', day: 'FRI', event: 'Date Party', location: 'TBD', time: null },
+  { date: '2026-04-04', day: 'SAT', event: 'Y2K Party w/ Fiji (Darty if weather permits)', location: 'Heavy Hands', time: null },
+  { date: '2026-04-07', day: 'TUE', event: 'Corner Rental', location: 'Corner', time: '9pm' },
+  { date: '2026-04-09', day: 'THU', event: 'FORMAL', location: 'Toronto', time: null, special: 'formal' },
+  { date: '2026-04-10', day: 'FRI', event: 'FORMAL', location: 'Toronto', time: null, special: 'formal' },
+  { date: '2026-04-11', day: 'SAT', event: 'FORMAL', location: 'Toronto', time: null, special: 'formal' },
+  { date: '2026-04-15', day: 'WED', event: 'Shark Night', location: 'Heavy Hands', time: '8pm' },
+  { date: '2026-04-17', day: 'FRI', event: 'CJ\'s Rental (Big Little)', location: "CJ's", time: '10pm' },
+  { date: '2026-04-18', day: 'SAT', event: 'PC Keg Race before Y2K', location: 'Duplex', time: 'Pregame' },
+  { date: '2026-04-18', day: 'SAT', event: 'Woodstock Darty w/ FOF', location: 'Heavy Hands', time: null },
+  { date: '2026-04-21', day: 'TUE', event: 'Corner Rental', location: 'Corner', time: '9pm' },
+  { date: '2026-04-23', day: 'THU', event: 'Space Jam Party w/ Fiji', location: 'House', time: null },
+  { date: '2026-04-24', day: 'FRI', event: 'Great American Race', location: 'Heavy Hands', time: '5am' },
+  { date: '2026-04-24', day: 'FRI', event: 'ZTA Social into CJ\'s Rental', location: "CJ's", time: '10pm' },
+  { date: '2026-04-28', day: 'TUE', event: '3-2-1 Night (Reds Game)', location: 'Reds Stadium', time: '6:40pm' },
+  { date: '2026-05-01', day: 'FRI', event: "CJ's Rental", location: "CJ's", time: '10pm' },
+  { date: '2026-05-02', day: 'SAT', event: 'Del Tiki w/ FOF', location: 'Duplex', time: null },
+  { date: '2026-05-07', day: 'THU', event: "CJ's Rental", location: "CJ's", time: '10pm' },
+  { date: '2026-05-08', day: 'FRI', event: 'Toga Party', location: 'House', time: null },
+  { date: '2026-05-09', day: 'SAT', event: 'Worm Crawl', location: "CJ's", time: '10am-noon' },
+  { date: '2026-05-10', day: 'SUN', event: 'Senior Passdowns', location: 'House', time: null, special: 'formal' },
+];
+
+function categorize(ev) {
+  const n = ev.event.toLowerCase();
+  if (ev.special === 'formal') return 'formal';
+  if (ev.special === 'break') return 'special';
+  if (n.includes('formal') || n.includes('toronto') || n.includes('passdown')) return 'formal';
+  if (n.includes('rental') || n.includes('bar crawl') || n.includes('corner') || n.includes('cj') || n.includes('worm crawl') || n.includes('reds') || n.includes('race') || n.includes('keg race') || n.includes('tourney')) return 'rental';
+  if (n.includes('retreat') || n.includes('spring break')) return 'special';
+  return 'party';
+}
+
+function catColor(cat) {
+  const map = { party: '#c896f0', rental: '#88bbf5', formal: '#d4b87a', special: '#f08080', other: '#6b6b80' };
+  return map[cat] || map.other;
+}
+
+function formatTime(t) {
+  if (!t) return '';
+  return t;
+}
+
+const months = ['January','February','March','April','May'];
+
+function groupByMonth(events) {
+  const groups = {};
+  events.forEach(ev => {
+    const d = new Date(ev.date + 'T12:00:00');
+    const m = d.toLocaleString('default', { month: 'long' });
+    if (!groups[m]) groups[m] = [];
+    groups[m].push({...ev, dateObj: d});
+  });
+  return groups;
+}
+
+let currentFilter = 'all';
+
+function renderList(filter) {
+  const container = document.getElementById('list-view');
+  let events = rawEvents;
+  if (filter && filter !== 'all') {
+    events = events.filter(ev => {
+      const d = new Date(ev.date + 'T12:00:00');
+      return d.toLocaleString('default', { month: 'long' }) === filter;
+    });
+  }
+
+  const groups = groupByMonth(events);
+  let html = '';
+  const monthOrder = months.filter(m => groups[m]);
+  monthOrder.forEach(month => {
+    html += `<div class="month-block" data-month="${month}">`;
+    html += `<div class="month-label">${month} 2026<span class="count-badge">${groups[month].length}</span></div>`;
+    groups[month].forEach((ev, i) => {
+      const cat = categorize(ev);
+      const color = catColor(cat);
+      const d = ev.dateObj;
+      const dayNum = d.getDate();
+
+      if (ev.special === 'break') {
+        html += `<div class="break-banner" style="animation-delay:${i*30}ms">${ev.event} &mdash; March 20-29</div>`;
+        return;
+      }
+
+      html += `<div class="event-row ${cat === 'formal' ? 'special' : ''}" style="animation-delay:${i*25}ms">
+        <div class="event-date">
+          <div class="day-num">${dayNum}</div>
+          <div class="day-name">${ev.day}</div>
+        </div>
+        <div class="event-info">
+          <div class="event-name">
+            <div class="event-dot" style="background:${color}"></div>
+            ${ev.event}
+          </div>
+          ${ev.location ? `<div class="event-meta">📍 ${ev.location}</div>` : ''}
+        </div>
+        ${ev.time ? `<div class="event-time">${ev.time}</div>` : ''}
+      </div>`;
+    });
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+  document.getElementById('total-count').textContent = rawEvents.length;
+}
+
+function renderCalendar() {
+  const container = document.getElementById('calendar-view');
+  const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html = '';
+
+  // Group events by date string
+  const byDate = {};
+  rawEvents.forEach(ev => {
+    if (!byDate[ev.date]) byDate[ev.date] = [];
+    byDate[ev.date].push(ev);
+  });
+
+  const monthNums = { January:0, February:1, March:2, April:3, May:4 };
+
+  months.forEach(month => {
+    const monthIdx = monthNums[month];
+    const year = 2026;
+    const firstDay = new Date(year, monthIdx, 1).getDay();
+    const daysInMonth = new Date(year, monthIdx+1, 0).getDate();
+
+    html += `<div class="cal-month">`;
+    html += `<div class="cal-month-header">${month}</div>`;
+    html += `<div class="cal-grid">`;
+    dows.forEach(d => { html += `<div class="cal-dow">${d}</div>`; });
+
+    // Empty cells before first day
+    for (let i = 0; i < firstDay; i++) {
+      html += `<div class="cal-day empty"></div>`;
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}-${String(monthIdx+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const evs = byDate[dateStr] || [];
+      const hasEv = evs.length > 0;
+      html += `<div class="cal-day ${hasEv ? 'has-event' : ''}">`;
+      html += `<div class="cal-day-num">${day}</div>`;
+      evs.forEach(ev => {
+        const cat = categorize(ev);
+        const short = ev.event.length > 18 ? ev.event.substring(0,16)+'…' : ev.event;
+        html += `<div class="cal-event-chip cat-${cat}">${short}</div>`;
+      });
+      html += `</div>`;
+    }
+
+    // Fill remaining cells
+    const totalCells = firstDay + daysInMonth;
+    const remainder = totalCells % 7;
+    if (remainder !== 0) {
+      for (let i = 0; i < 7 - remainder; i++) {
+        html += `<div class="cal-day empty"></div>`;
+      }
+    }
+
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function filterMonth(month, btn) {
+  currentFilter = month;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderList(month);
+}
+
+function setView(view, btn) {
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (view === 'list') {
+    document.getElementById('list-view').style.display = 'block';
+    document.getElementById('calendar-view').style.display = 'none';
+    document.querySelector('.controls').style.display = 'flex';
+  } else {
+    document.getElementById('list-view').style.display = 'none';
+    document.getElementById('calendar-view').style.display = 'block';
+    document.querySelector('.controls').style.display = 'none';
+  }
+}
+
+// Init
+renderList('all');
+renderCalendar();
+</script>
+</body>
+</html>
